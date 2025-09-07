@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"); /*To import outfit font*/
+@import "tailwindcss"; /*To import tailwind css*/ 
+
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+
+
+* {
+  font-family: "Outfit", sans-serif; /*Added the font family Outfit*/
+}
+
+
+@theme {
+  /* --color-primary: #5044E5; */
+  --color-primary: #254D70;
+  --color-primary-dull: #1F58D8;
+  --color-light: #F1F5F9;
+  --box-shadow: 0 12px 24px 2px rgb(129 146 179 / 8%);
+}
+
+
+
+
+
+
+
+
+
+
+@layer utilities {
+  .animate-scroll {
+    animation: scroll-x 30s linear infinite;
+  }
+
+  .mask-linear {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      white 10%,
+      white 90%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      white 10%,
+      white 90%,
+      transparent
+    );
+  }
+
+  @keyframes scroll-x {
+    to {
+      transform: translateX(calc(-50% - 0.5rem));
+    }
+  }
+}
