@@ -16,10 +16,7 @@ const connectDB = async () => {
       });
     }
 
-    await mongoose.connect(`${process.env.MONGODB_URI}/Interview_Experience`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(`${process.env.MONGODB_URI}/Interview_Experience`);
 
   } catch (error) {
     console.error('❌ Database Connection Failed:', error.message);
