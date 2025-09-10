@@ -17,7 +17,7 @@ const GithubSection = () => {
         </p>
 
         <a
-          href="#"
+          href="https://github.com/VaibhavPatil01/Interview-Experience-GSMCOE"
           target="_blank"
           rel="noopener noreferrer"
           className="text-xl sm:text-2xl bg-primary hover:bg-primary-dull transition px-6 py-3 rounded-lg text-white font-medium"
