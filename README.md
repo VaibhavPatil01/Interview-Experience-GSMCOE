@@ -1,6 +1,6 @@
 # 🎓 Interview Experience GSMCOE
 
-Welcome to the **Interview Experience GSMCOE** project!  
+Welcome to the **Interview Experience GSMCOE** project!
 A community-driven platform built with the MERN stack that enables students to share their real interview experiences, explore others’ journeys, and get well-prepared for placements. 
 
 The platform provides a collaborative space where students of GSMCOE can document, share, and learn from detailed interview experiences of peers, thereby enhancing collective placement readiness and confidence.
