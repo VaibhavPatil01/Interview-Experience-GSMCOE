@@ -68,7 +68,7 @@ Students can browse, search, and filter interview posts by **company, role, or t
   - Eslint
   - Prettier
 
-## Usage
+## Usage 
 
 ### As a Student:
 1. Register or login with your account.  
