@@ -18,7 +18,7 @@ The platform provides a collaborative space where students of GSMCOE can documen
 
 ## Project Overview
 
-**Interview Experience GSMCOE** is designed to help students preparing for placements by providing a repository of **real interview experiences** shared by their peers.  
+**Interview Experience GSMCOE** is designed to help students preparing for placements by providing a repository of **real interview experiences** shared by their peers. 
 
 Students can browse, search, and filter interview posts by **company, role, or tags**, as well as share their own experiences. The platform ensures every student has **equal access to preparation resources**.
 
