@@ -127,7 +127,7 @@ Contributions are welcome! 🎉
 Feel free to fork the repo, create a feature branch, and submit a pull request.
 
 
-## Contact
+## Contact 
 If you have any questions or suggestions, feel free to reach out!  
 **Developer**: Vaibhav Patil  
 **College**: GSMCOE  
