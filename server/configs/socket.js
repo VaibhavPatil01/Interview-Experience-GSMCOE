@@ -1,20 +1,13 @@
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import Redis from 'ioredis';
+import { redisConnection } from './redis.js';
 import decodeToken from '../utils/token/decodeToken.js';
-import winston from 'winston';
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [new winston.transports.Console()]
-});
+import logger from '../utils/logger.js';
 
 let io;
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const pubClient = new Redis(REDIS_URL);
-const subClient = pubClient.duplicate();
+const pubClient = redisConnection.duplicate();
+const subClient = redisConnection.duplicate();
 
 pubClient.on('error', (err) => logger.error('[Socket.io Redis Pub] Error', { event: 'WEBSOCKET_ERROR', errorCategory: 'WEBSOCKET_ERROR', error: err.message }));
 subClient.on('error', (err) => logger.error('[Socket.io Redis Sub] Error', { event: 'WEBSOCKET_ERROR', errorCategory: 'WEBSOCKET_ERROR', error: err.message }));
