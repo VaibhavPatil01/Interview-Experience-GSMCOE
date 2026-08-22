@@ -120,7 +120,6 @@ export async function registerUser(req, res) {
       password: hashPassword,
       isAdmin: false,
       isEmailVerified: false,
-      about: about || '',
     };
 
     // create user account
