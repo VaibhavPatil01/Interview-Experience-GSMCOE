@@ -4,18 +4,20 @@ import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables from .env
 
-const makeRequestToServer = (SERVER_BASE_URL, limit) => {
-  axios
-    .get(SERVER_BASE_URL)
-    .then((res) => console.log('Ping Success:', SERVER_BASE_URL, res.status))
-    .catch((err) => {
-      console.error('Ping Failed:', SERVER_BASE_URL, err?.response?.status || err.message);
-
-      // Try again if attempts left 
-      if (limit > 0) {
-        makeRequestToServer(SERVER_BASE_URL, limit - 1);
+const makeRequestToServer = async (SERVER_BASE_URL, limit) => {
+  for (let i = 0; i < limit; i++) {
+    try {
+      const res = await axios.get(SERVER_BASE_URL);
+      console.log(`Ping Success: ${SERVER_BASE_URL} (Status: ${res.status})`);
+      return; // Success, exit function
+    } catch (err) {
+      console.error(`Ping Failed: ${SERVER_BASE_URL} (Attempt ${i + 1}/${limit}) - ${err?.response?.status || err.message}`);
+      if (i < limit - 1) {
+        // Wait 2 seconds before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
-    });
+    }
+  }
 };
 
 const preventServerSleep = () => {
