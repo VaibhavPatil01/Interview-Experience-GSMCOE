@@ -85,23 +85,13 @@ export async function registerUser(req, res) {
     username,
     email,
     password,
-    branch,
-    passingYear,
-    designation,
-    about,
-    github,
-    linkedin,
   } = req.body;
 
   // checking if required fields are undefined
   if (
     !username ||
     !email ||
-    !password ||
-    !branch ||
-    !passingYear ||
-    !designation ||
-    !about
+    !password
   ) {
     return res
       .status(401)
@@ -130,12 +120,7 @@ export async function registerUser(req, res) {
       password: hashPassword,
       isAdmin: false,
       isEmailVerified: false,
-      branch,
-      passingYear,
-      designation,
-      about,
-      github: github ? github : null,
-      linkedin: linkedin ? linkedin : null,
+      about: about || '',
     };
 
     // create user account
@@ -223,12 +208,7 @@ export async function getLoginStatus(req, res) {
       username: user.username,
       email: user.email,
       isAdmin: user.isAdmin,
-      branch: user.branch,
-      passingYear: user.passingYear,
-      designation: user.designation,
       about: user.about,
-      github: user.github,
-      linkedin: user.linkedin,
       phone: user.phone,
       skills: user.skills,
       socialLinks: user.socialLinks,
