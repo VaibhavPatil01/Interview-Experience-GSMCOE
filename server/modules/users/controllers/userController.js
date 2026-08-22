@@ -79,6 +79,7 @@ export async function loginUser(req, res) {
     return res.status(500).json({ message: 'Something went wrong.....' });
   }
 }
+
 // Registers a new user and sends an email verification link
 export async function registerUser(req, res) {
   const {
@@ -144,6 +145,7 @@ export async function registerUser(req, res) {
     return res.status(500).json({ message: 'Something went wrong.....' });
   }
 }
+
 // Verifies the user's email using the token sent to their inbox
 export async function verifyEmail(req, res) {
   const emailVerificationToken = req.params['token'];
@@ -171,6 +173,7 @@ export async function verifyEmail(req, res) {
     return res.send('<h1>Error Authenticating</h1>');
   }
 }
+
 // Checks current login status and returns decoded user data if valid
 export async function getLoginStatus(req, res) {
   let token = req.headers['token'];
@@ -231,6 +234,7 @@ export async function getLoginStatus(req, res) {
       .json({ isLoggedIn: false, isAdmin: false, admin: null, user: null });
   }
 }
+
 // Fetches the public profile data and post statistics for a specific user ID
 export async function getUserProfile(req, res) {
   const paramId = req.params['id'];
@@ -263,6 +267,7 @@ export async function getUserProfile(req, res) {
     return res.status(500).json({ message: 'something went wrong...' });
   }
 }
+
 // Deletes the currently authenticated user's account
 export async function deleteUser(req, res) {
   const userData = req.body.authTokenData;
