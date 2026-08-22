@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// Generates a secure, temporary JWT token used for authenticating password reset requests via email links
 const generateForgotPasswordToken = (id, email, isAdmin) => {
   if (!process.env['SECRET_KEY']) {
     console.log('JWT key is undefined');

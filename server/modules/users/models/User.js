@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Mongoose schema for User profiles containing core auth details, preferences, and extensive resume data
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },

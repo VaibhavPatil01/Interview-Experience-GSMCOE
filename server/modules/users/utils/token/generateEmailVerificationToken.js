@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// Generates a short-lived JWT token used specifically for verifying a user's email address upon registration
 const generateEmailVerificationToken = (id, email, isAdmin) => {
   if (!process.env['SECRET_KEY']) {
     console.log('JWT key is undefined');

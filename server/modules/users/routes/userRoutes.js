@@ -4,6 +4,8 @@ import { deleteUser, updateUserProfile, updateProfilePicture, uploadUserResume, 
 import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { handleImageUpload, handleResumeUpload } from '../../../middlewares/upload.js';
 
+// Express router for user authentication, profile management, and OAuth integrations
+
 const userRouter = express.Router();
 
 // Authentication & Onboarding

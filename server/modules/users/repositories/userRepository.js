@@ -2,26 +2,32 @@ import mongoose from 'mongoose';
 import UserModel from '../models/User.js'
 
 
+// Finds a user in the database by their email address
 export const findUserByEmail = (email) => {
   return UserModel.findOne({ email });
 };
 
+// Deletes a user document from the database using their ID
 export const deleteUser = (id) => { 
   return UserModel.deleteOne({ _id: id }); 
 };
 
+// Updates a user document and returns the newly updated document
 export const updateUser = (id, data) => {
   return UserModel.findByIdAndUpdate(id, data, { new: true });
 };
 
+// Creates a new user record in the database
 export const createUser = (user) => { 
   return UserModel.create(user);
 };
 
+// Marks a user's email as verified in the database
 export const verifyUserEmail = (email) => {
   return UserModel.findOneAndUpdate({ email }, { isEmailVerified: true });
 };
 
+// Performs an aggregation query to fetch user profile along with their post statistics
 export async function getUserProfile(userId) {
   return await UserModel.aggregate([
     {
@@ -66,21 +72,19 @@ export async function getUserProfile(userId) {
   ]);
 }
 
-export const editUserProfile = (
-  userId,
-  updatedProfile,
-) => {
-  return UserModel.findByIdAndUpdate(userId, updatedProfile);
-};
 
+
+// Updates the user's hashed password in the database
 export const updatePassword = (email, newPassword) => {
   return UserModel.findOneAndUpdate({ email }, { password: newPassword });
 }; 
 
+// Finds a user in the database by their unique object ID
 export const findUserById = (id) => {
   return UserModel.findOne({ _id: id });
 };
 
+// Searches for verified users by username using regex and pagination limits
 export const searchUsers = (
   search,
   limit,
@@ -116,6 +120,7 @@ export const searchUsers = (
   ]);
 };
 
+// Counts the total number of verified users in the database
 export const countUsers = () => {
   return UserModel.countDocuments({ isEmailVerified: true });
 };

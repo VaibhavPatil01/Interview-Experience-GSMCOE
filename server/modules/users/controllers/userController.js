@@ -9,7 +9,7 @@ import generateForgotPasswordToken from '../utils/token/generateForgotPasswordTo
 import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
 import { eventBus, EVENTS } from '../../posts/events/index.js';
 
-
+// Authenticates a user and returns a JWT token
 export async function loginUser(req, res) {
   const email = req.body.email;
   const password = req.body.password;
@@ -79,9 +79,7 @@ export async function loginUser(req, res) {
     return res.status(500).json({ message: 'Something went wrong.....' });
   }
 }
-
-
-
+// Registers a new user and sends an email verification link
 export async function registerUser(req, res) {
   const {
     username,
@@ -162,9 +160,7 @@ export async function registerUser(req, res) {
     return res.status(500).json({ message: 'Something went wrong.....' });
   }
 }
-
-
-
+// Verifies the user's email using the token sent to their inbox
 export async function verifyEmail(req, res) {
   const emailVerificationToken = req.params['token'];
 
@@ -191,9 +187,7 @@ export async function verifyEmail(req, res) {
     return res.send('<h1>Error Authenticating</h1>');
   }
 }
-
-
-
+// Checks current login status and returns decoded user data if valid
 export async function getLoginStatus(req, res) {
   let token = req.headers['token'];
 
@@ -258,9 +252,7 @@ export async function getLoginStatus(req, res) {
       .json({ isLoggedIn: false, isAdmin: false, admin: null, user: null });
   }
 }
-
-
-
+// Fetches the public profile data and post statistics for a specific user ID
 export async function getUserProfile(req, res) {
   const paramId = req.params['id'];
 
@@ -292,9 +284,7 @@ export async function getUserProfile(req, res) {
     return res.status(500).json({ message: 'something went wrong...' });
   }
 }
-
-
-
+// Deletes the currently authenticated user's account
 export async function deleteUser(req, res) {
   const userData = req.body.authTokenData;
 
@@ -316,57 +306,12 @@ export async function deleteUser(req, res) {
   }
 }
 
-
-
-export async function editUserProfile(req, res) {
-  const {
-    username,
-    branch,
-    passingYear,
-    designation,
-    about,
-    github,
-    linkedin,
-  } = req.body;
-
-  if (!username || !branch || !passingYear || !designation || !about) {
-    return res.status(401).json({ message: 'Please enter all the fields ' });
-  }
-
-  const updatedProfile = {
-    username,
-    branch,
-    passingYear,
-    designation,
-    about,
-    github: github ? github : null,
-    linkedin: linkedin ? linkedin : null,
-  };
-
-  const userId = req.body.authTokenData.id;
-  try {
-    const user = await editProfile(userId, updatedProfile);
-
-    // AI Layer Sync
-    eventBus.emit(EVENTS.USER_UPDATED, { userId: userId });
-
-    return res
-      .status(200)
-      .json({ message: 'User Profile Edited Successfully', data: user });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: 'something went wrong......' });
-  }
-}
-
-
-
+// Logs out the user by sending a successful logout response
 export function logoutUser(req, res) {
   return res.status(200).json({ message: 'User Logout successful' });
 }
 
-
-
+// Generates a password reset token and sends an email to the user
 export async function forgotPassword(req, res) {
   const email = req.body?.email;
 
@@ -405,8 +350,7 @@ export async function forgotPassword(req, res) {
   }
 }
 
-
-
+// Resets the user's password using the provided valid token
 export async function resetPassword(req, res) {
   const email = req.body.email;
   const newPassword = req.body.password;
@@ -458,8 +402,7 @@ export async function resetPassword(req, res) {
   }
 }
 
-
-
+// Handles successful Google OAuth login and redirects with JWT token
 export async function googleLogin(req, res) {
   if (!req.user) {
     return res.send('ERROR with Google Login');
@@ -481,6 +424,7 @@ export async function googleLogin(req, res) {
   return res.redirect(`${clientURL}/token/google/${token}`);
 }
 
+// Handles successful GitHub OAuth login and redirects with JWT token
 export async function githubLogin(req, res) {
   if (!req.user) {
     return res.send('ERROR with GitHub Login');
@@ -502,8 +446,7 @@ export async function githubLogin(req, res) {
   return res.redirect(`${clientURL}/token/github/${token}`);
 }
 
-
-
+// Searches for users by username with pagination support
 export async function searchUser(req, res) {
   let search = req.query['searchparam'];
   let page = parseInt(req.query['page']) - 1;
@@ -548,8 +491,7 @@ export async function searchUser(req, res) {
   }
 }
 
-
-
+// Updates the authenticated user's profile details
 export async function updateUserProfile(req, res) {
   let token = req.headers['token'];
 
@@ -581,6 +523,7 @@ export async function updateUserProfile(req, res) {
   }
 }
 
+// Handles uploading and updating the user's profile picture via Cloudinary
 export async function updateProfilePicture(req, res) {
   try {
     const authTokenData = req.authTokenData;
@@ -613,6 +556,7 @@ export async function updateProfilePicture(req, res) {
   }
 }
 
+// Handles uploading and updating the user's resume via Cloudinary
 export async function uploadUserResume(req, res) {
   try {
     const authTokenData = req.authTokenData;

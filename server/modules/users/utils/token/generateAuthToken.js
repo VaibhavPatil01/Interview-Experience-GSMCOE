@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// Generates a JWT authentication token used for user sessions and API authorization
 const generateAuthToken = (id, email, isAdmin) => {
   if (!process.env['SECRET_KEY']) {
     throw new Error('JWT SECRET_KEY key not defined');
