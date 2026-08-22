@@ -13,11 +13,9 @@ const generateForgotPasswordToken = (id, email, isAdmin) => {
     isAdmin,
   };
 
-  // Time the token is valid for
-  const expiryTimeInMilliSecondsSeconds = 10 * 60 * 1000;
-
+  // Time the token is valid for (10 minutes)
   const token = jwt.sign(tokenBody, process.env['SECRET_KEY'], {
-    expiresIn: expiryTimeInMilliSecondsSeconds,
+    expiresIn: '10m',
   });
 
   if (!token) throw new Error('Could not generate forgot password token');
