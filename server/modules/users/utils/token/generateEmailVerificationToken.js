@@ -13,9 +13,9 @@ const generateEmailVerificationToken = (id, email, isAdmin) => {
     isAdmin,
   };
 
-  const token = jwt.sign(tokenBody, process.env['SECRET_KEY']);
+  const token = jwt.sign(tokenBody, process.env['SECRET_KEY'], { expiresIn: '24h' });
 
-  if (!token) throw new Error('Could not generate forgot password token');
+  if (!token) throw new Error('Could not generate email verification token');
   return token;
 };
 
