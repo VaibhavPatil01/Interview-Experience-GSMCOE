@@ -13,7 +13,7 @@ export const analyzeResume = async (formData) => {
 };
 
 export const reanalyzeResume = async (id, data) => {
-  const response = await apiClient.post(`/api/resume-analyzer/${id}/reanalyze`, { jobRole });
+  const response = await apiClient.post(`/api/resume-analyzer/${id}/reanalyze`, data);
   return response.data;
 };
 
