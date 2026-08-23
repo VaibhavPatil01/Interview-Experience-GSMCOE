@@ -81,7 +81,7 @@ An interactive, AI-driven chat assistant engineered to simulate high-pressure te
 ## Demo
 
 Experience the platform live:    
-[Live Demo](https://interview-experience-gsmcoe.vercel.app/)
+[Live Demo](https://experio-beryl.vercel.app/)
 
 ## Future Improvements
 
