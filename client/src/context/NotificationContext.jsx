@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { io } from 'socket.io-client';
 import getAuthToken from '../utils/getAuthToken';
 import { useAppSelector } from '../redux/store';
 import { BASE_API_URL } from '../services/serverConfig';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   fetchNotifications, 
   fetchUnreadCount, 
@@ -119,7 +118,7 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [isLoggedIn, activeTab]);
 
-  const loadInitialNotifications = async () => {
+  const loadInitialNotifications = useCallback(async () => {
     try {
       setIsFetching(true);
       setError(null);
@@ -139,9 +138,9 @@ export const NotificationProvider = ({ children }) => {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, [activeTab]);
 
-  const loadMoreNotifications = async () => {
+  const loadMoreNotifications = useCallback(async () => {
     if (!hasMore || isFetching) return;
     try {
       setIsFetching(true);
@@ -166,27 +165,18 @@ export const NotificationProvider = ({ children }) => {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, [activeTab, cursor, hasMore, isFetching]);
 
-  const loadUnreadCount = async () => {
+  const loadUnreadCount = useCallback(async () => {
     try {
       const res = await fetchUnreadCount();
       setUnreadCount(res.data.count);
     } catch (error) {
       console.error('Failed to load unread count:', error);
     }
-  };
+  }, []);
 
-  const markReadMutation = useMutation({
-    mutationFn: ({ isGrouped, id, notifIds }) => {
-      if (isGrouped) {
-        return markNotificationRead('batch', notifIds);
-      } else {
-        return markNotificationRead(id);
-      }
-    }
-  });
-  const markAsRead = async (notif) => {
+  const markAsRead = useCallback(async (notif) => {
     console.log('markAsRead triggered for:', notif);
     // Only proceed if it is actually unread in our local state to prevent loop/spam
     const existingNotif = notifications.find(n => n._id === (typeof notif === 'string' ? notif : notif._id));
@@ -221,38 +211,50 @@ export const NotificationProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to mark read:', error);
     }
-  };
+  }, [notifications]);
 
-  const markAllReadMutation = useMutation({
-    mutationFn: markAllNotificationsRead
-  });
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     if (unreadCount === 0) return;
     
     setNotifications((prev) => prev.map(n => ({ ...n, isRead: true })));
     setUnreadCount(0);
     try {
-      markAllReadMutation.mutate();
+      await markAllNotificationsRead();
     } catch (error) {
       console.error('Failed to mark all read:', error);
     }
-  };
+  }, [unreadCount]);
+
+  const contextValue = useMemo(() => ({
+    socket,
+    notifications,
+    unreadCount,
+    isFetching,
+    error,
+    hasMore,
+    activeTab,
+    setActiveTab,
+    loadMoreNotifications,
+    loadInitialNotifications,
+    markAsRead,
+    markAllAsRead,
+  }), [
+    socket,
+    notifications,
+    unreadCount,
+    isFetching,
+    error,
+    hasMore,
+    activeTab,
+    setActiveTab,
+    loadMoreNotifications,
+    loadInitialNotifications,
+    markAsRead,
+    markAllAsRead
+  ]);
 
   return (
-    <NotificationContext.Provider value={{
-      socket,
-      notifications,
-      unreadCount,
-      isFetching,
-      error,
-      hasMore,
-      activeTab,
-      setActiveTab,
-      loadMoreNotifications,
-      loadInitialNotifications,
-      markAsRead,
-      markAllAsRead,
-    }}>
+    <NotificationContext.Provider value={contextValue}>
       {children}
     </NotificationContext.Provider>
   );
