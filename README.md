@@ -17,7 +17,6 @@ The platform ensures every student has **equal access to preparation resources**
 - [Project Overview](#project-overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Usage](#usage)
 - [Demo](#demo)
 - [Future Improvements](#future-improvements)
 - [Contributing](#contributing)
@@ -25,120 +24,108 @@ The platform ensures every student has **equal access to preparation resources**
 
 ## Project Overview
 
-**Interview Experience GSMCOE** is designed to help students preparing for placements by providing a repository of **real interview experiences** shared by their peers. 
+Experio goes beyond standard CRUD operations. It is a highly scalable, event-driven platform where the core community features (posting, commenting, sharing) are supercharged with AI capabilities.
 
-Students can browse, search, and filter interview posts by **company, role, or tags**, as well as share their own experiences. The platform ensures every student has **equal access to preparation resources**.
+The platform is designed to:
+- **Democratize Interview Prep**: Provide free access to real interview experiences.
+- **Provide Instant Feedback**: Use the RAG pipeline to give students instant, accurate, and non-hallucinated feedback on their resumes based on real past successful candidates.
+- **Simulate Real Interviews**: Provide a context-aware AI chat assistant that acts as an interviewer for any given company and role.
 
-### Key Features:
-- **User Authentication**: Secure registration & login with JWT-based authentication.  
-- **Post Management**: Users can write, edit, and view detailed interview experiences.  
-- **Comments & Reactions**: Engage with posts via comments, likes, and shares.  
-- **Search & Filter**: Quickly find experiences by company, role, or keywords.  
-- **Rate Us Section**: Students can rate the platform and update their feedback later.  
-- **Responsive UI**: Built with Tailwind CSS to support desktop and mobile devices.  
+Heavy background tasks like embedding synchronization and profile matching are offloaded to **BullMQ + Redis** workers. Real-time social updates and matchmaking notifications are pushed directly to the browser via **Socket.IO**.
 
 ## Features
 
-### Artificial Intelligence
-- **RAG Pipeline**: Utilizes **Qdrant Vector DB** for semantic similarity matching of interview experiences.
-- **Gemini 3.5 Flash**: Powers the intelligent resume grading and conversational assistant.
-- **Real-Time AI Status**: WebSocket integration keeps users updated on the status of background AI processing.
+### Intelligent Interview Repository & Social Hub
+A highly scalable, event-driven community platform designed for crowd-sourced placement preparation.
+- **Structured Experience Sharing**: Write detailed interview posts using a comprehensive, multi-step form that captures round-wise breakdowns, DSA topics, core subjects, and salary details.
+- **Event-Driven Engagement**: Upvote, bookmark, and comment on experiences with real-time updates pushed directly to the browser via **Socket.IO** and a **Redis WebSockets adapter**.
+- **Asynchronous Processing**: Heavy background tasks, such as profile matching and syncing new posts to the vector database, are aggressively offloaded to asynchronous **BullMQ** worker queues.
 
-### Community & Social
-- **Interview Repository**: Browse, search, and filter real interview experiences by company, role, or tags.
-- **Rich Text Authoring**: Write detailed posts with an integrated, image-optimized Quill editor.
-- **Engagement**: Upvote, comment, and share experiences.
+### Context-Aware AI Resume Analyzer
+A sophisticated evaluation pipeline that moves beyond basic keyword matching to deliver actionable, data-backed insights.
+- **RAG-Powered Benchmarking**: Utilizes a robust **Retrieval-Augmented Generation (RAG)** pipeline powered by **Qdrant Vector DB**. The analyzer performs semantic similarity searches against a curated database of successful past candidates to benchmark your resume.
+- **Gemini 3.5 Flash Inference**: Orchestrates document extraction and contextual retrieval, feeding the enriched structural context to Google's Gemini LLM to generate a deterministic, highly structured JSON evaluation report.
+- **Anti-Hallucination Layer**: Features a cross-referencing validation step that strictly verifies and enriches Gemini's citations against actual database documents, ensuring 100% accurate feedback.
 
-### Security & Cloud
-- **Robust Auth**: JWT-based stateless authentication, paired with Google & GitHub OAuth via Passport.js.
-- **Cloud Storage**: Seamless integration with **Cloudinary** for scalable profile picture and PDF resume hosting.
-- **Email Verification**: Automated OTP and verification links via Nodemailer. 
+### Conversational Mock Interview Assistant
+An interactive, AI-driven chat assistant engineered to simulate high-pressure technical and HR interview rounds.
+- **Hyper-Personalized Context**: Automatically ingests the specific company, role, and user profile data to dynamically adjust the interviewer's persona and question difficulty.
+- **Stateful Memory Management**: Employs a sophisticated sliding-window memory architecture. It summarizes older conversation turns while perfectly preserving recent context to adhere strictly to the LLM's token context limits.
+- **Resilient Streaming**: Leverages Server-Sent Events (SSE) to stream AI responses smoothly to the frontend without latency bottlenecks.
+
+### Enterprise-Grade Security & Cloud Infrastructure
+- **Stateless Authentication**: Secure JWT-based authentication paired with **Passport.js** for frictionless Google and GitHub OAuth 2.0 integration.
+- **Cloud Object Storage**: Direct integration with **Cloudinary** for scalable, high-performance hosting of user avatars and PDF resumes.
+- **Automated Mail Delivery**: Uses **Nodemailer** with Handlebars templates for dispatching secure OTPs and account verification emails.
 
 ## Tech Stack
 
-- **Frontend**:
-  - Javascript
-  - React
-  - Redux
-  - React Router Dom
-  - Formik and Yup
-  - React Query
-  - Axios
-  - React Hot Toast
-  - Quill Editor
-  - React Icons
-  - Helmet
-  - Eslint
-  - Prettier
-  - AirBnb Lint Configs
-  - Google Analytics and Google Search Console
+### Frontend (React Ecosystem)
+- **Core**: React 18, Vite
+- **State Management**: Redux Toolkit (Global), TanStack React Query (Server-state caching)
+- **Routing & Splitting**: React Router DOM with `Suspense` and `lazy()` for route-based code splitting
+- **Styling & UI**: Tailwind CSS, Framer Motion (Micro-interactions), React Hot Toast
+- **Rich Media**: Markdown/HTML Rendering
+- **Real-Time**: Socket.IO Client
 
-- **Backend**:
-  - Node.js
-  - Express.js
-  - MongoDB + Mongoose
-  - JWT (Authentication)
-  - Bcrypt.js (Password hashing)
-  - Eslint
-  - Prettier
-
-## Usage 
-
-### As a Student:
-1. Register or login with your account.  
-2. Browse interview experiences by company, role, or tags.  
-3. Post your own interview experience to help others.  
-4. Comment, upvote, and share experiences.  
-5. Rate the platform and give feedback.  
+### Backend (Node & AI Infrastructure)
+- **Core**: Node.js, Express.js
+- **Database**: MongoDB + Mongoose (Document Store)
+- **Vector DB**: Qdrant (Semantic Search & RAG)
+- **Message Queue**: BullMQ + Redis (Asynchronous Job Processing)
+- **AI Models**: Google GenAI SDK (Gemini 3.5 Flash & Text Embeddings)
+- **Authentication**: JWT, Passport.js (OAuth 2.0)
+- **Cloud Media**: Cloudinary + Multer
+- **Real-Time**: Socket.IO + Redis Adapter (Scalable WebSockets)
 
 ## Demo
 
-You can view the live demo of the project here:  
+Experience the platform live:    
 [Live Demo](https://interview-experience-gsmcoe.vercel.app/)
 
 ## Future Improvements
 
 This project is continuously evolving. Some planned features include:  
 
-- **Downloadable Interview Guides**  
-- **Notification System** (email + in-app)  
-- **Mobile App (React Native)**  
-- **Leaderboard for Most Helpful Posts**  
-- **Company-specific preparation guides**  
+- **Downloadable Interview Guides**: Auto-compile company-specific interview guides based on community posts.
+- **Mobile App**: React Native version for on-the-go preparation.
+- **Leaderboard**: Gamification to reward the most helpful post authors.
+- **Advanced Analytics**: Dashboard showing company hiring trends and frequency of specific technical questions.
 
 ## Screenshots
 
 Here are some screenshots of the project in action:
 
 ### 1. **Homepage**:  
-![Homepage](https://i.postimg.cc/fb3X5b3Y/home-page.png)  
+![Homepage](https://i.postimg.cc/yd09qM8j/Screenshot-2026-08-23-172639.png)  
 
 ### 2. **Profile Page**:  
-![Profile Page](https://i.postimg.cc/vTyVQL0v/profile-page.png)  
+![Profile Page](https://i.postimg.cc/Twnm8z3J/Screenshot-2026-08-23-172724.png)  
 
 ### 3. **Post List**:  
-![Post List](https://i.postimg.cc/133DnBsC/post-list.png)  
+![Post List](https://i.postimg.cc/B62DWrnx/Screenshot-2026-08-23-172742.png)  
 
-### 4. **Login Page**:  
-![Login Page](https://i.postimg.cc/G2yF3pdb/login.png)  
+### 4. **Post Form**:  
+![Post Form](https://i.postimg.cc/1tD6xk36/Screenshot-2026-08-23-172808.png)
 
-### 5. **Registration Page**:  
-![Registration Page](https://i.postimg.cc/FFbST8KC/registration.png)  
+### 5. **AI Resume Analyzer**:  
+![AI Resume Analyzer](https://i.postimg.cc/1tD6xk3w/Screenshot-2026-08-23-174447.png)  
 
-### 6. **Post Form**:  
-![Post Form](https://i.postimg.cc/GhrFrrN1/post-form.png)  
+### 5. **AI Chat Assistant**:  
+![AI Chat Assistant](https://i.postimg.cc/gJ3R9C2Z/Screenshot-2026-08-23-174527.png)  
 
-### 7. **User List**:  
-![User List](https://i.postimg.cc/Z5nyKqxX/user-list.png)  
+### 6. **Users List**:  
+![Users List](https://i.postimg.cc/fLYX4GRS/Screenshot-2026-08-23-180636.png)  
 
-### 8. **Events Page**:  
-![Events Page](https://i.postimg.cc/RhwLdZDg/events.png)  
+### 7. **Login Page**:  
+![Login Page](https://i.postimg.cc/B62DWrn7/Screenshot-2026-08-23-172538.png)  
+
 
 ---
 
 ## Contributing
 Contributions are welcome! 🎉  
-Feel free to fork the repo, create a feature branch, and submit a pull request.
+Whether it's optimizing the RAG pipeline or enhancing the UI, feel free to fork the repo, create a feature branch, and submit a pull request.
 
 
 ## Contact 
