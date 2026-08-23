@@ -7,7 +7,6 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "server": "nodemon server.js",
     "start": "node server.js",
-    "copy-assets": "node tools/copyAssets.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write ."
@@ -18,11 +17,9 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^2.13.0",
-    "@google/generative-ai": "^0.24.1",
     "@qdrant/js-client-rest": "^1.18.0",
     "@socket.io/redis-adapter": "^8.3.0",
     "axios": "^1.10.0",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.81.2",
     "cloudinary": "^1.41.3",
@@ -43,11 +40,9 @@
     "node-cron": "^4.2.0",
     "nodemailer": "^7.0.5",
     "nodemailer-express-handlebars": "^6.0.0",
-    "openai": "^7.1.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
-    "path": "^0.12.7",
     "pdf-parse": "^2.4.5",
     "socket.io": "^4.8.3",
     "winston": "^3.17.0"
@@ -61,7 +56,6 @@
     "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "shelljs": "^0.10.0",
     "supertest": "^7.2.2"
   }
 }
