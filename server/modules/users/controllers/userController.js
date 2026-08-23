@@ -6,7 +6,7 @@ import decodeToken from '../../../utils/token/decodeToken.js';
 import generateAuthToken from '../utils/token/generateAuthToken.js';
 import generateEmailVerificationToken from '../utils/token/generateEmailVerificationToken.js';
 import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
-import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, editProfile, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
+import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
 import { eventBus, EVENTS } from '../../posts/events/index.js';
 
 // Authenticates a user and returns a JWT token
