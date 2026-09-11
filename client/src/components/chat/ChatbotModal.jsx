@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useChatStream } from '../../hooks/useChatStream';
 import { useFingerprint } from '../../hooks/useFingerprint';
-import { createSession, fetchSessionMessages, syncGuestSession } from '../../services/chatServices';
+import { createSession, fetchSessionMessages } from '../../services/chatServices';
 import ChatHistoryModal from './ChatHistoryModal';
 import { assets } from '../../assets/assets';
 import { useAppSelector } from '../../redux/store.js';
@@ -30,50 +30,38 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const { visitorId } = useFingerprint();
   const messagesEndRef = useRef(null);
+  const isInitialMount = useRef(true);
 
-  // Handle Authentication State Changes (Logout/Init Guest)
+  // Handle Authentication State Changes (Logout/Login)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (!isAuthenticated) {
+        // Initial load as guest: restore chat
+        const storedGuestHistory = localStorage.getItem('guestChatHistory');
+        if (storedGuestHistory) {
+          try {
+            setMessages(JSON.parse(storedGuestHistory));
+          } catch (e) {
+            setMessages([]);
+          }
+        }
+      }
+      return;
+    }
+
+    // Actual transitions
     if (!isAuthenticated) {
+      // Logged in -> Logged out
       setActiveSessionId(null);
       localStorage.removeItem('sharedActiveChatId');
-      const storedGuestHistory = localStorage.getItem('guestChatHistory');
-      if (storedGuestHistory) {
-        try {
-          setMessages(JSON.parse(storedGuestHistory));
-        } catch (e) {
-          console.error("Failed to parse guest history", e);
-          setMessages([]);
-        }
-      } else {
-        setMessages([]);
-      }
+      localStorage.removeItem('guestChatHistory');
+      setMessages([]);
+    } else {
+      // Logged out -> Logged in
+      localStorage.removeItem('guestChatHistory');
+      setMessages([]);
     }
-  }, [isAuthenticated]);
-
-  // Sync Guest History on Login
-  useEffect(() => {
-    const syncGuestHistory = async () => {
-      const storedGuestHistory = localStorage.getItem('guestChatHistory');
-      if (isAuthenticated && storedGuestHistory) {
-        // Remove immediately to prevent React Strict Mode from double-firing the sync
-        localStorage.removeItem('guestChatHistory');
-        try {
-          const parsedHistory = JSON.parse(storedGuestHistory);
-          if (parsedHistory.length > 0) {
-            setIsCreatingSession(true);
-            const session = await syncGuestSession(parsedHistory);
-            setActiveSessionId(session._id);
-            setIsCreatingSession(false);
-          }
-        } catch (e) {
-          console.error("Failed to sync guest history", e);
-          // Optionally restore if failed
-          localStorage.setItem('guestChatHistory', storedGuestHistory);
-          setIsCreatingSession(false);
-        }
-      }
-    };
-    syncGuestHistory();
   }, [isAuthenticated]);
 
   useEffect(() => {
