@@ -1,5 +1,6 @@
 import ChatPipelineService from '../services/ChatPipelineService.js';
 import logger from '../../../utils/logger.js';
+import quotaService from '../../ai/services/quotaService.js';
 
 const pipelineService = new ChatPipelineService();
 
@@ -35,12 +36,14 @@ export const streamChatGeneration = async (req, res) => {
       
       // If the pipeline throws an error internally, it yields a { type: 'error' } chunk
       if (chunk.type === 'error') {
+        if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
         break;
       }
     }
 
   } catch (error) {
     logger.error('Fatal error in streamChatGeneration', { error: error.message, stack: error.stack });
+    if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     res.write(`data: ${JSON.stringify({ type: 'error', error: 'Internal streaming error' })}\n\n`);
   } finally {
     res.end(); // Always close the stream
@@ -71,10 +74,14 @@ export const streamGuestChatGeneration = async (req, res) => {
         break;
       }
       res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-      if (chunk.type === 'error') break;
+      if (chunk.type === 'error') {
+        if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
+        break;
+      }
     }
   } catch (error) {
     logger.error('Fatal error in streamGuestChatGeneration', { error: error.message, stack: error.stack });
+    if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     res.write(`data: ${JSON.stringify({ type: 'error', error: 'Internal streaming error' })}\n\n`);
   } finally {
     res.end();
@@ -106,9 +113,13 @@ export const regenerateChat = async (req, res) => {
     for await (const chunk of generator) {
       if (req.aborted || res.closed) break;
       res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-      if (chunk.type === 'error') break;
+      if (chunk.type === 'error') {
+        if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
+        break;
+      }
     }
   } catch (error) {
+    if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     res.write(`data: ${JSON.stringify({ type: 'error', error: 'Internal regeneration error' })}\n\n`);
   } finally {
     res.end();
