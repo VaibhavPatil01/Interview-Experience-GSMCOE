@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
 import { useChatStream } from '../../hooks/useChatStream';
 import { useFingerprint } from '../../hooks/useFingerprint';
 import { createSession, fetchSessionMessages } from '../../services/chatServices';
@@ -26,6 +26,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   });
   const [inputValue, setInputValue] = useState('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState(null);
 
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const { visitorId } = useFingerprint();
@@ -123,6 +124,14 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     if (!isAuthenticated) {
       localStorage.removeItem('guestChatHistory');
     }
+  };
+
+  const handleCopy = (msgId, content) => {
+    navigator.clipboard.writeText(content);
+    setCopiedMsgId(msgId);
+    setTimeout(() => {
+      setCopiedMsgId(null);
+    }, 2000);
   };
 
   const handleSend = async (textToSend = inputValue) => {
@@ -443,10 +452,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               </div>
               <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
-                  onClick={() => navigator.clipboard.writeText(msg.content)}
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+                  onClick={() => handleCopy(msg.id, msg.content)}
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors cursor-pointer"
                 >
-                  <Copy className="w-3.5 h-3.5" />
+                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>
@@ -462,13 +471,13 @@ const ChatbotModal = ({ isOpen, onClose }) => {
               </div>
               
               <div className="flex items-center gap-1 mt-1 ml-9 text-gray-400">
-                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><ThumbsUp className="w-3.5 h-3.5" /></button>
-                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><ThumbsDown className="w-3.5 h-3.5" /></button>
+                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"><ThumbsUp className="w-3.5 h-3.5" /></button>
+                <button className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"><ThumbsDown className="w-3.5 h-3.5" /></button>
                 <button 
-                  onClick={() => navigator.clipboard.writeText(msg.content)}
-                  className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={() => handleCopy(msg.id, msg.content)}
+                  className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
-                  <Copy className="w-3.5 h-3.5" />
+                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>

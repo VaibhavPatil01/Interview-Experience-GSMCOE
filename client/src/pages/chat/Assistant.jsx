@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, Plus, PenSquare, Sparkles, Search, PanelLeft,
-  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink, Share2
+  ThumbsUp, ThumbsDown, Copy, RotateCw, MoreHorizontal, Edit2, Upload, Pin, PinOff, Trash2, MessageCircle, Square, ExternalLink, Share2, Check
 } from 'lucide-react';
 
 import ReactMarkdown from 'react-markdown';
@@ -44,6 +44,7 @@ const Assistant = () => {
   const [inputValue, setInputValue] = useState('');
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState(null);
   
   const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -167,6 +168,14 @@ const Assistant = () => {
   }, []);
 
   // UI Handlers
+  const handleCopy = (msgId, content) => {
+    navigator.clipboard.writeText(content);
+    setCopiedMsgId(msgId);
+    setTimeout(() => {
+      setCopiedMsgId(null);
+    }, 2000);
+  };
+
   const handleTogglePin = async (e, id) => {
     e.stopPropagation();
     const chat = chatHistory.find(c => c.id === id);
@@ -582,7 +591,12 @@ const Assistant = () => {
                             {msg.text}
                           </div>
                           <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"><Copy className="w-4 h-4" /></button>
+                            <button 
+                              onClick={() => handleCopy(msg.id, msg.text)}
+                              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg cursor-pointer"
+                            >
+                              {copiedMsgId === msg.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                            </button>
                           </div>
                         </div>
                       ) : (
@@ -604,7 +618,7 @@ const Assistant = () => {
                                   href={cite.url} 
                                   target="_blank" 
                                   rel="noreferrer"
-                                  className="flex items-center gap-2 bg-gray-100 dark:bg-[#2f2f2f] hover:bg-gray-200 dark:hover:bg-[#3f3f3f] px-3 py-1.5 rounded-full text-[13px] font-medium text-gray-700 dark:text-gray-300 transition-colors border border-gray-200 dark:border-gray-700"
+                                  className="flex items-center gap-2 bg-gray-100 dark:bg-[#2f2f2f] hover:bg-gray-200 dark:hover:bg-[#3f3f3f] px-3 py-1.5 rounded-full text-[13px] font-medium text-gray-700 dark:text-gray-300 transition-colors border border-gray-200 dark:border-gray-700 cursor-pointer"
                                 >
                                   <ExternalLink className="w-3.5 h-3.5" />
                                   <span>{cite.company} • {cite.role}</span>
@@ -614,9 +628,14 @@ const Assistant = () => {
                           )}
 
                           <div className="flex items-center gap-1 mt-2 text-gray-400">
-                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors ${msg.feedback === 'like' ? 'text-primary' : ''}`}><ThumbsUp className="w-4 h-4" /></button>
-                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors ${msg.feedback === 'dislike' ? 'text-red-500' : ''}`}><ThumbsDown className="w-4 h-4" /></button>
-                            <button className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors"><Copy className="w-4 h-4" /></button>
+                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors cursor-pointer ${msg.feedback === 'like' ? 'text-primary' : ''}`}><ThumbsUp className="w-4 h-4" /></button>
+                            <button className={`p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors cursor-pointer ${msg.feedback === 'dislike' ? 'text-red-500' : ''}`}><ThumbsDown className="w-4 h-4" /></button>
+                            <button 
+                              onClick={() => handleCopy(msg.id, msg.text)}
+                              className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors cursor-pointer"
+                            >
+                              {copiedMsgId === msg.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                            </button>
                           </div>
                         </div>
                       </div>
