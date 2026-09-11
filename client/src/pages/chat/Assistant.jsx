@@ -306,7 +306,10 @@ const Assistant = () => {
         />
         <div className="flex items-center gap-3 flex-shrink-0 pr-1">
           <div className="relative flex items-center justify-center">
-            <button className="peer cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex items-center justify-center">
+            <button 
+              onClick={() => toast('Feature not available')}
+              className="peer cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors flex items-center justify-center"
+            >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>

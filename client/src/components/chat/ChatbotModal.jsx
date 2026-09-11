@@ -576,7 +576,10 @@ const ChatbotModal = ({ isOpen, onClose }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+          <button 
+            onClick={() => toast('Feature not available')}
+            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+          >
             <Mic className="w-5 h-5" />
           </button>
           <button 
