@@ -455,7 +455,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
                   onClick={() => handleCopy(msg.id, msg.content)}
                   className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors cursor-pointer"
                 >
-                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>
@@ -477,7 +477,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
                   onClick={() => handleCopy(msg.id, msg.content)}
                   className="p-1.5 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
-                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>

@@ -595,7 +595,7 @@ const Assistant = () => {
                               onClick={() => handleCopy(msg.id, msg.text)}
                               className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg cursor-pointer"
                             >
-                              {copiedMsgId === msg.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                              {copiedMsgId === msg.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                             </button>
                           </div>
                         </div>
@@ -634,7 +634,7 @@ const Assistant = () => {
                               onClick={() => handleCopy(msg.id, msg.text)}
                               className="p-1.5 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded-lg transition-colors cursor-pointer"
                             >
-                              {copiedMsgId === msg.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                              {copiedMsgId === msg.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                             </button>
                           </div>
                         </div>
