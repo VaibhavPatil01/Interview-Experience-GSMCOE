@@ -30,37 +30,38 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const { visitorId } = useFingerprint();
   const messagesEndRef = useRef(null);
-  const isInitialMount = useRef(true);
+  const prevAuth = useRef(isAuthenticated);
 
-  // Handle Authentication State Changes (Logout/Login)
+  // Initial Load for Guest
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (!isAuthenticated) {
-        // Initial load as guest: restore chat
-        const storedGuestHistory = localStorage.getItem('guestChatHistory');
-        if (storedGuestHistory) {
-          try {
-            setMessages(JSON.parse(storedGuestHistory));
-          } catch (e) {
-            setMessages([]);
-          }
+    if (!isAuthenticated) {
+      const storedGuestHistory = localStorage.getItem('guestChatHistory');
+      if (storedGuestHistory) {
+        try {
+          setMessages(JSON.parse(storedGuestHistory));
+        } catch (e) {
+          console.error("Failed to parse guest history", e);
         }
       }
-      return;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // Actual transitions
-    if (!isAuthenticated) {
-      // Logged in -> Logged out
-      setActiveSessionId(null);
-      localStorage.removeItem('sharedActiveChatId');
-      localStorage.removeItem('guestChatHistory');
-      setMessages([]);
-    } else {
-      // Logged out -> Logged in
-      localStorage.removeItem('guestChatHistory');
-      setMessages([]);
+  // Handle Authentication State Transitions (Logout/Login)
+  useEffect(() => {
+    if (prevAuth.current !== isAuthenticated) {
+      if (!isAuthenticated) {
+        // Transition: Logged in -> Logged out
+        setActiveSessionId(null);
+        localStorage.removeItem('sharedActiveChatId');
+        localStorage.removeItem('guestChatHistory');
+        setMessages([]);
+      } else {
+        // Transition: Logged out -> Logged in
+        localStorage.removeItem('guestChatHistory');
+        setMessages([]);
+      }
+      prevAuth.current = isAuthenticated;
     }
   }, [isAuthenticated]);
 
@@ -80,12 +81,12 @@ const ChatbotModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isAuthenticated && messages.length > 0) {
-      // Don't save if it's currently generating because streamText is temporary
-      if (!isGenerating) {
+      // Don't save if it's currently generating or if there was a stream error
+      if (!isGenerating && !streamError) {
         localStorage.setItem('guestChatHistory', JSON.stringify(messages));
       }
     }
-  }, [messages, isAuthenticated, isGenerating]);
+  }, [messages, isAuthenticated, isGenerating, streamError]);
 
   useEffect(() => {
     const loadActiveSessionMessages = async () => {

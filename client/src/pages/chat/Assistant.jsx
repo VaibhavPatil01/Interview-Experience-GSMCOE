@@ -116,10 +116,17 @@ const Assistant = () => {
     }
   };
 
+  const skipNextFetch = useRef(false);
+
   // Switch Chat Load Messages
   useEffect(() => {
     if (activeChatId === 'new') {
       setCurrentMessages([]);
+      return;
+    }
+    
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
       return;
     }
     
@@ -239,6 +246,8 @@ const Assistant = () => {
         
         // Add to sidebar
         setChatHistory([{ id: targetSessionId, label: newSession.title, isPinned: false }, ...chatHistory]);
+        
+        skipNextFetch.current = true;
         setActiveChatId(targetSessionId);
       }
 
