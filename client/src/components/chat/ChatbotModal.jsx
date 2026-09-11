@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { X, MoreHorizontal, Maximize2, Plus, Smile, Mic, ArrowUp, Mail, Volume2, VolumeX, Zap, History, Search, Trash2, Sparkles, Square, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useChatStream } from '../../hooks/useChatStream';
+import { useFingerprint } from '../../hooks/useFingerprint';
 import { createSession, fetchSessionMessages, syncGuestSession } from '../../services/chatServices';
 import ChatHistoryModal from './ChatHistoryModal';
 import { assets } from '../../assets/assets';
@@ -27,6 +28,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const [isCreatingSession, setIsCreatingSession] = useState(false);
 
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
+  const { visitorId } = useFingerprint();
   const messagesEndRef = useRef(null);
 
   // Handle Authentication State Changes (Logout/Init Guest)
@@ -152,7 +154,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     if (!isAuthenticated) {
       // Guest Chat Flow
       try {
-        await startGuestStream([...messages, newUserMsg], userPrompt, 'gemini-3.5-flash', (finalMessage) => {
+        await startGuestStream([...messages, newUserMsg], userPrompt, visitorId, 'gemini-3.5-flash', (finalMessage) => {
           setMessages(prev => [...prev, {
             id: finalMessage._id || Date.now().toString(),
             sender: finalMessage.role === 'user' ? 'user' : 'system',

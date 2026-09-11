@@ -70,7 +70,8 @@ const AIResumeAnalyser = () => {
       toast.success('Resume re-analyzed successfully!');
     } catch (error) {
       console.error('Error re-analyzing resume:', error);
-      toast.error(error.response?.data?.error || 'Failed to re-analyze resume.');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Failed to re-analyze resume.';
+      toast.error(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
@@ -172,7 +173,8 @@ const AIResumeAnalyser = () => {
       toast.success('Resume analyzed successfully!');
     } catch (error) {
       console.error('Error analyzing resume:', error);
-      toast.error(error.response?.data?.error || 'Failed to analyze resume. Please try again.');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Failed to analyze resume. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
