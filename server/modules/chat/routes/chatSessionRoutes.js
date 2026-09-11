@@ -5,11 +5,15 @@ import * as chatMessageController from '../controllers/chatMessageController.js'
 import isUserAuth from '../../../middlewares/isUserAuth.js';
 import { strictChatLimiter } from '../../../middlewares/rateLimiter.js';
 import { sanitizeInput, verifySessionOwnership } from '../../../middlewares/chatSecurity.js';
+import { aiQuotaLimiter } from '../../../middlewares/aiQuotaLimiter.js';
+import { aiIPRateLimiter } from '../../../middlewares/aiIPRateLimiter.js';
+import { aiGlobalLimiter } from '../../../middlewares/aiGlobalLimiter.js';
+import { anonIdentity } from '../../../middlewares/anonIdentity.js';
 
 const router = express.Router();
 
 // Guest / Unauthenticated Routes
-router.post('/guest/chat', strictChatLimiter, sanitizeInput, chatStreamController.streamGuestChatGeneration);
+router.post('/guest/chat', anonIdentity, aiIPRateLimiter(), strictChatLimiter, aiGlobalLimiter, aiQuotaLimiter('assistant'), sanitizeInput, chatStreamController.streamGuestChatGeneration);
 
 // Global Authentication Middleware
 router.use(isUserAuth);
@@ -27,8 +31,8 @@ router.delete('/:sessionId', verifySessionOwnership, chatSessionController.softD
 router.put('/:sessionId/restore', verifySessionOwnership, chatSessionController.restoreSession);
 
 // Chat Streams & AI Generation
-router.post('/:sessionId/chat', verifySessionOwnership, strictChatLimiter, sanitizeInput, chatStreamController.streamChatGeneration);
-router.post('/:sessionId/messages/:messageId/regenerate', verifySessionOwnership, strictChatLimiter, chatStreamController.regenerateChat);
+router.post('/:sessionId/chat', verifySessionOwnership, strictChatLimiter, aiGlobalLimiter, aiQuotaLimiter('assistant'), sanitizeInput, chatStreamController.streamChatGeneration);
+router.post('/:sessionId/messages/:messageId/regenerate', verifySessionOwnership, strictChatLimiter, aiGlobalLimiter, aiQuotaLimiter('assistant'), chatStreamController.regenerateChat);
 router.post('/:sessionId/stop', verifySessionOwnership, chatStreamController.abortChatStream);
 
 // Message CRUD & Feedback
