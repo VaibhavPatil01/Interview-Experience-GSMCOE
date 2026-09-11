@@ -30,7 +30,7 @@ export const useChatStream = () => {
       if (!response.ok) {
         if (response.status === 429) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Daily AI usage limit reached. Please try again tomorrow.');
+          throw new Error(errorData.message || "Daily Usage Limit Reached\nThis project is built for demonstration and portfolio purposes, so daily usage is intentionally limited to 2 requests per day to ensure the project remains accessible to everyone.");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -113,7 +113,7 @@ export const useChatStream = () => {
       if (!response.ok) {
         if (response.status === 429) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Daily AI usage limit reached. Please try again tomorrow.');
+          throw new Error(errorData.message || "Daily Usage Limit Reached\nYou've reached today's usage limit. This project is built for demonstration and portfolio purposes, so daily usage is intentionally limited to 2 requests per day to ensure the project remains accessible to everyone.");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }

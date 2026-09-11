@@ -60,7 +60,7 @@ export const aiQuotaLimiter = (type) => {
       return res.status(429).json({
         success: false,
         code: 'DAILY_AI_QUOTA_EXCEEDED',
-        message: 'Daily AI usage limit reached. Please try again tomorrow.',
+        message: "Daily Usage Limit Reached\nThis project is built for demonstration and portfolio purposes, so daily usage is intentionally limited to 2 requests per day to ensure the project remains accessible to everyone.",
         remaining: 0
       });
     }
