@@ -3,6 +3,7 @@ import ResumeAnalysisOrchestrator from '../services/ResumeAnalysisOrchestrator.j
 import ResumeAnalysisRepository from '../repositories/ResumeAnalysisRepository.js';
 import logger from '../../../utils/logger.js';
 import ResumeAnalysisError, { ErrorCategories } from '../errors/ResumeAnalysisError.js';
+import quotaService from '../../ai/services/quotaService.js';
 
 const repository = new ResumeAnalysisRepository();
 
@@ -65,6 +66,7 @@ export const analyzeResume = async (req, res) => {
       }
     }
   } catch (error) {
+    if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     if (error instanceof ResumeAnalysisError) {
       // Log the categorized error so we can see the internalDetails
       logger.error('Categorized Resume Analysis Error', { 
@@ -256,6 +258,7 @@ export const reanalyzeResume = async (req, res) => {
       data: newAnalysis
     });
   } catch (error) {
+    if (req.aiQuotaKey) quotaService.releaseQuota(req.aiQuotaKey).catch(console.error);
     if (error instanceof ResumeAnalysisError) {
       const statusCode = error.category === ErrorCategories.VALIDATION_ERROR ? 400 : 500;
       return res.status(statusCode).json({ 
