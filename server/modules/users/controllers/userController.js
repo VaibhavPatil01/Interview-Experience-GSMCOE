@@ -8,6 +8,7 @@ import generateEmailVerificationToken from '../utils/token/generateEmailVerifica
 import generateForgotPasswordToken from '../utils/token/generateForgotPasswordToken.js';
 import { findUser, deleteUserService, createUser, resetPasswordService, verifyUserEmail, searchUserService, countUsersService, getUserProfileService, updateUserService } from '../services/userService.js';
 import { eventBus, EVENTS } from '../../posts/events/index.js';
+import quotaService from '../../ai/services/quotaService.js';
 
 // Authenticates a user and returns a JWT token
 export async function loginUser(req, res) {
@@ -48,6 +49,14 @@ export async function loginUser(req, res) {
 
     // generate JWT token
     const token = generateAuthToken(user._id, email, user.isAdmin);
+
+    // Merge anonymous AI Quota usage if present
+    const cookieId = req.cookies?.experio_anon_id;
+    const visitorId = req.headers['x-visitor-id'];
+    if (cookieId || visitorId) {
+      // Background execution is fine here
+      quotaService.mergeAnonymousToUser(visitorId, cookieId, user._id).catch(console.error);
+    }
 
     // Remove the password
     return res.status(200).json({
@@ -403,6 +412,12 @@ export async function googleLogin(req, res) {
   // generate JWT token
   const token = generateAuthToken(user._id, email, user.isAdmin);
 
+  // Merge anonymous AI Quota usage if present
+  const cookieId = req.cookies?.experio_anon_id;
+  if (cookieId) {
+    quotaService.mergeAnonymousToUser(null, cookieId, user._id).catch(console.error);
+  }
+
   // Successful authentication, redirect home.
   const clientURL = process.env['CLIENT_BASE_URL'] || 'http://localhost:3000';
   return res.redirect(`${clientURL}/token/google/${token}`);
@@ -424,6 +439,12 @@ export async function githubLogin(req, res) {
 
   // generate JWT token
   const token = generateAuthToken(user._id, email, user.isAdmin);
+
+  // Merge anonymous AI Quota usage if present
+  const cookieId = req.cookies?.experio_anon_id;
+  if (cookieId) {
+    quotaService.mergeAnonymousToUser(null, cookieId, user._id).catch(console.error);
+  }
 
   // Successful authentication, redirect home.
   const clientURL = process.env['CLIENT_BASE_URL'] || 'http://localhost:3000';
