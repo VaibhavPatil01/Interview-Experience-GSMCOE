@@ -23,7 +23,14 @@ function GithubTokenSetter() {
 
       // Reading github login redirect url and clearing it from local storage
       const redirectUrl = getLocalStorageData('github-login-redirect');
-      navigate(redirectUrl || '/');
+      localStorage.removeItem('github-login-redirect');
+      
+      let finalRedirect = '/';
+      if (redirectUrl && typeof redirectUrl === 'string' && redirectUrl !== 'undefined' && redirectUrl !== 'null') {
+        finalRedirect = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`;
+      }
+      
+      navigate(finalRedirect);
     };
 
     handleGithubTokenSetter();
