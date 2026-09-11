@@ -28,6 +28,10 @@ export const useChatStream = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Daily AI usage limit reached. Please try again tomorrow.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -88,7 +92,7 @@ export const useChatStream = () => {
     }
   }, []);
 
-  const startGuestStream = useCallback(async (history, prompt, model = 'gemini-3.5-flash', onComplete = null) => {
+  const startGuestStream = useCallback(async (history, prompt, visitorId, model = 'gemini-3.5-flash', onComplete = null) => {
     setIsGenerating(true);
     setStreamText('');
     setStreamError(null);
@@ -99,13 +103,18 @@ export const useChatStream = () => {
       const response = await fetch(`${BASE_API_URL}/api/chat/sessions/guest/chat`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-visitor-id': visitorId || ''
         },
         body: JSON.stringify({ prompt, model, history }),
         signal: abortControllerRef.current.signal
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Daily AI usage limit reached. Please try again tomorrow.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
