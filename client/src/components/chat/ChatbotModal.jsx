@@ -507,8 +507,8 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         )}
 
         {streamError && (
-          <div className="text-red-500 mt-2 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-            Error: {streamError}
+          <div className="text-red-500 mt-2 text-sm bg-red-50 p-3.5 rounded-xl border border-red-200 whitespace-pre-wrap leading-relaxed">
+            {streamError.replace('Error: ', '')}
           </div>
         )}
         
