@@ -62,9 +62,6 @@ export class PromptBuilder {
     const parts = [];
 
     parts.push(`Entity Type: User Profile`);
-    if (user.branch) parts.push(`Branch/Major: ${user.branch}`);
-    if (user.passingYear) parts.push(`Passing Year: ${user.passingYear}`);
-    if (user.designation) parts.push(`Designation: ${user.designation}`);
     if (user.about) parts.push(`About: ${user.about}`);
 
     if (user.skills && user.skills.length > 0) {

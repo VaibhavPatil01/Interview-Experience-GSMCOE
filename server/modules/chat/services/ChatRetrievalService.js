@@ -70,7 +70,7 @@ export default class ChatRetrievalService {
       return cachedProfile;
     }
 
-    const user = await User.findById(userId).select('username branch passingYear designation skills').lean();
+    const user = await User.findById(userId).select('username skills').lean();
     if (!user) throw new Error('User not found');
     
     profileCache.set(cacheKey, user);
@@ -152,7 +152,7 @@ export default class ChatRetrievalService {
         role: post.role,
         status: post.status,
         author: post.userId ? post.userId.username : 'Anonymous',
-        authorDetails: post.userId ? `${post.userId.designation || 'Student'} in ${post.userId.branch || 'Unknown'}` : '',
+        authorDetails: post.userId ? 'Student' : '',
         score: scoreObj ? scoreObj.score : 0,
         url: `/post/${post._id}` // Citation reference link
       };
@@ -168,19 +168,10 @@ export default class ChatRetrievalService {
    * Formats the user profile and conversation summary into a clean system instruction string.
    */
   formatSystemContext(userProfile, summary) {
-    const { username, branch, passingYear, designation, skills } = userProfile;
+    const { username, skills } = userProfile;
     
     let ctx = `System Role: You are the AI Assistant for Experio, a platform dedicated to career growth, interview preparation, and professional networking.\n`;
     ctx += `User Context: You are talking to ${username}. `;
-    
-    const details = [];
-    if (designation) details.push(`They work as a ${designation}`);
-    if (branch) details.push(`They are from the ${branch} branch`);
-    if (passingYear) details.push(`Class of ${passingYear}`);
-    
-    if (details.length > 0) {
-      ctx += details.join(' and ') + '. ';
-    }
 
     if (skills && skills.length > 0) {
       ctx += `Their skills include: ${skills.join(', ')}. `;

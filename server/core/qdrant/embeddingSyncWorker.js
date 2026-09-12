@@ -56,10 +56,6 @@ export const initEmbeddingSyncWorker = () => {
         const vector = await EmbeddingService.generateEmbedding(documentStr);
         
         const payload = {
-          branch: user.branch,
-          designation: user.designation,
-          skills: user.skills || [],
-          passingYear: user.passingYear,
           createdDate: new Date(user.createdAt).getTime(),
           version: 1
         };
