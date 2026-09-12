@@ -18,7 +18,7 @@ const ProfileLeftSide = ({ profileData, isEditable }) => {
     const year = date.getFullYear();
     return `${day} ${month}, ${year}`;
   };
-  const [phoneInput, setPhoneInput] = useState(profileData?.phone || '+91 7249412825');
+  const [phoneInput, setPhoneInput] = useState(profileData?.phone || '');
   const [basicDetails, setBasicDetails] = useState({
     username: '',
     gender: 'Prefer not to say',
@@ -199,7 +199,7 @@ const ProfileLeftSide = ({ profileData, isEditable }) => {
       <div className="bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
         <div className="flex items-center gap-3 text-gray-700 mb-4">
           <Phone className="w-5 h-5 text-primary" />
-          <span className="text-[15px]">{profileData?.phone || '+91 7249412825'}</span>
+          <span className="text-[15px]">{profileData?.phone || 'Add Phone Number'}</span>
           {isEditable && (
             <button onClick={() => setIsPhoneModalOpen(true)} className="ml-auto text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
               <img src={assets.penIcon} alt="edit" className="w-[18px] h-[18px] opacity-60 hover:opacity-100 transition-opacity" />
