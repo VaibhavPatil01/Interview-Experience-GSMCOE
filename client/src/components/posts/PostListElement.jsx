@@ -54,12 +54,9 @@ function PostListElement({ post, openModal, openDeleteModal }) {
     bookmarkMutation.mutate();
   };
 
-  // Tags aggregation
+  // Tags aggregation (using technologies)
   let tags = [];
-  if (post.dsaTopics && post.dsaTopics.length > 0) tags = [...tags, ...post.dsaTopics];
-  if (post.tags && post.tags.length > 0) tags = [...tags, ...post.tags];
-  if (tags.length === 0) tags = ['Data Structures', 'Algorithms', 'System Design']; // Fallback
-  
+  if (post.technologies && post.technologies.length > 0) tags = [...post.technologies];
   const displayTags = tags.slice(0, 4);
   const extraTags = tags.length > 4 ? tags.length - 4 : 0;
 
@@ -222,18 +219,20 @@ function PostListElement({ post, openModal, openDeleteModal }) {
       </div>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-5">
-        {displayTags.map((tag, idx) => (
-          <span key={idx} className="text-[11px] font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
-            {tag}
-          </span>
-        ))}
-        {extraTags > 0 && (
-          <span className="text-[11px] font-medium text-gray-500 bg-gray-50 px-2.5 py-1 rounded-md">
-            +{extraTags}
-          </span>
-        )}
-      </div>
+      {displayTags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-5">
+          {displayTags.map((tag, idx) => (
+            <span key={idx} className="text-[11px] font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+              {tag}
+            </span>
+          ))}
+          {extraTags > 0 && (
+            <span className="text-[11px] font-medium text-gray-500 bg-gray-50 px-2.5 py-1 rounded-md">
+              +{extraTags}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
