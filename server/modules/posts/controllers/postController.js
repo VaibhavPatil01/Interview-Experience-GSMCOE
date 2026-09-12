@@ -190,7 +190,7 @@ export async function createPost(req, res) {
     const post = await createPostService(postData);
     
     // AI Layer Sync
-    eventBus.emit(EVENTS.POST_CREATED, { postId: post._id });
+    eventBus.emit(EVENTS.POST_CREATED, { postId: post._id.toString() });
 
     logger.info(`[PostController] Post Created`, {
       event: 'POST_CREATED_EVENT',
