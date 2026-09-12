@@ -26,3 +26,22 @@ export const subscribeToChatSync = (callback) => {
     window.removeEventListener(CHAT_SYNC_EVENT, handleSync);
   };
 };
+
+const MESSAGES_SYNC_EVENT = 'chat-messages-updated';
+
+export const dispatchMessagesSync = (sessionId) => {
+  const event = new CustomEvent(MESSAGES_SYNC_EVENT, { detail: { sessionId } });
+  window.dispatchEvent(event);
+};
+
+export const subscribeToMessagesSync = (callback) => {
+  const handleSync = (event) => {
+    callback(event.detail.sessionId);
+  };
+  
+  window.addEventListener(MESSAGES_SYNC_EVENT, handleSync);
+  return () => {
+    window.removeEventListener(MESSAGES_SYNC_EVENT, handleSync);
+  };
+};
+

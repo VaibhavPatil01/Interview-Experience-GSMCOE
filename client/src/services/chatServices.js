@@ -1,7 +1,7 @@
 import apiClient from './apiClient.js';
 
 export const fetchSessions = async (page = 1, limit = 20) => {
-  const response = await apiClient.get(`/api/chat/sessions/?page=${page}&limit=${limit}`);
+  const response = await apiClient.get(`/api/chat/sessions/?page=${page}&limit=${limit}&t=${Date.now()}`);
   return response.data;
 };
 
@@ -32,8 +32,8 @@ export const deleteSession = async (sessionId) => {
 
 export const fetchSessionMessages = async (sessionId, limit = 50, beforeCursor = null) => {
   const url = beforeCursor 
-    ? `/api/chat/sessions/${sessionId}/messages?limit=${limit}&beforeCursor=${beforeCursor}`
-    : `/api/chat/sessions/${sessionId}/messages?limit=${limit}`;
+    ? `/api/chat/sessions/${sessionId}/messages?limit=${limit}&beforeCursor=${beforeCursor}&t=${Date.now()}`
+    : `/api/chat/sessions/${sessionId}/messages?limit=${limit}&t=${Date.now()}`;
   const response = await apiClient.get(url);
   return response.data;
 };

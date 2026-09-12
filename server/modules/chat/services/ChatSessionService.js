@@ -13,22 +13,30 @@ export default class ChatSessionService {
    * Generates a short title based on the first prompt
    */
   async generateTitle(prompt) {
-    try {
-      const promptText = `Generate a very short, concise title (max 5 words) summarizing this chat prompt. Do not use quotes or prefixes. Prompt: "${prompt}"`;
-      const response = await geminiClient.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: promptText
-      });
-      let title = (response.text || '').trim();
-      
-      // Clean up potential quotes
-      title = title.replace(/^["'](.*)["']$/, '$1');
-      
-      return title || 'New Conversation';
-    } catch (error) {
-      logger.error('Failed to generate session title via Gemini', { error: error.message, prompt });
-      return 'New Conversation'; // Fallback
+    const promptText = `Generate a very short, concise title (max 5 words) summarizing this chat prompt. Do not use quotes or prefixes. Prompt: "${prompt}"`;
+    const maxRetries = 3;
+    let delay = 1000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await geminiClient.models.generateContent({
+          model: 'gemini-3.5-flash',
+          contents: promptText
+        });
+        let title = (response.text || '').trim();
+        title = title.replace(/^["'](.*)["']$/, '$1');
+        return title || 'New Conversation';
+      } catch (error) {
+        if (attempt === maxRetries) {
+          logger.error('Failed to generate session title via Gemini after max retries', { error: error.message, prompt });
+          return 'New Conversation'; // Fallback
+        }
+        logger.warn(`Rate limit hit during title generation. Retrying in ${delay}ms...`, { attempt });
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
     }
+    return 'New Conversation';
   }
 
   async createSession(userId, initialPrompt) {
