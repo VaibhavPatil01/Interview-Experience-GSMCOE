@@ -18,14 +18,14 @@ import {
   pinSession, 
   deleteSession, 
   fetchSessionMessages,
-  submitFeedback,
-  syncGuestSession
+  submitFeedback
 } from '../../services/chatServices';
+
 import { useChatStream } from '../../hooks/useChatStream';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ChatHistoryModal from '../../components/chat/ChatHistoryModal';
 import { assets } from '../../assets/assets';
-import { subscribeToChatSync, dispatchChatSync } from '../../utils/chatSync';
+import { subscribeToChatSync, dispatchChatSync, subscribeToMessagesSync, dispatchMessagesSync } from '../../utils/chatSync';
 const AIAvatar = () => (
   <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
     <img src={assets.chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
@@ -77,58 +77,55 @@ const Assistant = () => {
 
   // Handle Authentication State Changes
   useEffect(() => {
-    if (isLoggedIn) {
-      loadSessions();
-    } else {
-      setChatHistory([]);
-      setCurrentMessages([]);
-      setActiveChatId('new');
-      localStorage.removeItem('sharedActiveChatId');
-    }
-  }, [isLoggedIn]);
-
-  // Sync Guest History on Login/Mount
-  useEffect(() => {
-    const syncGuestHistory = async () => {
-      const storedGuestHistory = localStorage.getItem('guestChatHistory');
-      if (isLoggedIn && storedGuestHistory) {
-        // Remove immediately to prevent React Strict Mode from double-firing the sync
-        localStorage.removeItem('guestChatHistory');
+    const initUserData = async () => {
+      if (isLoggedIn) {
+        // Load all sessions from server
         try {
-          const parsedHistory = JSON.parse(storedGuestHistory);
-          if (parsedHistory.length > 0) {
-            setIsCreatingSession(true);
-            const session = await syncGuestSession(parsedHistory);
-            setActiveChatId(session._id);
-            // Also add to chatHistory so it appears in the sidebar
-            setChatHistory(prev => [{ id: session._id, label: session.title || 'New Conversation', isPinned: false }, ...prev]);
-            setIsCreatingSession(false);
-          }
-        } catch (e) {
-          console.error("Failed to sync guest history", e);
-          // Optionally restore if failed
-          localStorage.setItem('guestChatHistory', storedGuestHistory);
-          setIsCreatingSession(false);
+          const data = await fetchSessions();
+          const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
+          setChatHistory(sessionsArray.map(s => ({
+            id: s._id,
+            label: s.title,
+            isPinned: s?.metadata?.isPinned || false
+          })));
+        } catch (error) {
+          console.error("Failed to load sessions", error);
         }
+      } else {
+        // Unauthenticated cleanup
+        setChatHistory([]);
+        setCurrentMessages([]);
+        setActiveChatId('new');
+        localStorage.removeItem('sharedActiveChatId');
       }
     };
-    syncGuestHistory();
+
+    initUserData();
   }, [isLoggedIn]);
 
-  const loadSessions = async () => {
-    try {
-      const data = await fetchSessions();
-      // The backend returns an array directly, not an object with a 'sessions' key
-      const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
-      setChatHistory(sessionsArray.map(s => ({
-        id: s._id,
-        label: s.title,
-        isPinned: s?.metadata?.isPinned || false
-      })));
-    } catch (error) {
-      console.error("Failed to load sessions", error);
-    }
-  };
+  // Listen for new sessions created in ChatbotModal
+  useEffect(() => {
+    const cleanup = subscribeToChatSync(() => {
+      if (isLoggedIn) {
+        // Reload sidebar when a new session is created elsewhere
+        const loadSessions = async () => {
+          try {
+            const data = await fetchSessions();
+            const sessionsArray = Array.isArray(data) ? data : (data.sessions || []);
+            setChatHistory(sessionsArray.map(s => ({
+              id: s._id,
+              label: s.title,
+              isPinned: s?.metadata?.isPinned || false
+            })));
+          } catch (error) {
+            console.error("Failed to load sessions after sync", error);
+          }
+        };
+        loadSessions();
+      }
+    });
+    return cleanup;
+  }, [isLoggedIn]);
 
   const skipNextFetch = useRef(false);
 
@@ -149,7 +146,6 @@ const Assistant = () => {
       try {
         const data = await fetchSessionMessages(activeChatId);
         const messagesArray = Array.isArray(data) ? data : (data.messages || []);
-        // Reverse because they come newest first from backend
         setCurrentMessages(messagesArray.reverse().map(m => ({
           id: m._id,
           sender: m.role,
@@ -160,12 +156,26 @@ const Assistant = () => {
         })));
       } catch (error) {
         console.error("Failed to load messages", error);
+        if (error.response && error.response.status === 404) {
+          // Session doesn't exist anymore, reset UI to prevent broken state
+          setActiveChatId('new');
+          localStorage.setItem('sharedActiveChatId', 'new');
+        }
       } finally {
         setIsLoadingMessages(false);
       }
     };
     
     loadMessages();
+
+    // Listen for background message updates (e.g. from ChatbotModal completing a stream)
+    const cleanup = subscribeToMessagesSync((sessionId) => {
+      if (sessionId === activeChatId) {
+        loadMessages();
+      }
+    });
+
+    return cleanup;
   }, [activeChatId]);
 
   // Auto Scroll
@@ -274,7 +284,7 @@ const Assistant = () => {
       }
 
       // 3. Start Stream
-      await startStream(targetSessionId, userPrompt, 'gemini-3.5-flash', (finalMessage) => {
+      await startStream(targetSessionId, userPrompt, 'gemini-flash-latest', (finalMessage) => {
         // Stream completed successfully, add final assistant message to UI
         setCurrentMessages(prev => [...prev, {
           id: finalMessage._id,
@@ -284,10 +294,13 @@ const Assistant = () => {
           citations: finalMessage.citations || [],
           feedback: finalMessage.feedback
         }]);
+        dispatchMessagesSync(targetSessionId);
       });
 
     } catch (error) {
       console.error("Chat generation error", error);
+      toast.error("Failed to send message. Please try again.");
+      setCurrentMessages(prev => prev.filter(msg => msg.id !== userMsg.id)); // Remove optimistic message
       setIsCreatingSession(false);
     }
   };

@@ -9,7 +9,7 @@ import ChatHistoryModal from './ChatHistoryModal';
 import { assets } from '../../assets/assets';
 import { useAppSelector } from '../../redux/store.js';
 import { toast } from 'react-hot-toast';
-import { subscribeToChatSync, dispatchChatSync } from '../../utils/chatSync';
+import { subscribeToChatSync, dispatchChatSync, subscribeToMessagesSync, dispatchMessagesSync } from '../../utils/chatSync';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.userState.user);
@@ -32,6 +32,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const { isGenerating, streamText, streamError, startStream, startGuestStream, stopStream } = useChatStream();
   const { visitorId } = useFingerprint();
   const messagesEndRef = useRef(null);
+  const skipNextFetch = useRef(false);
   const prevAuth = useRef(isAuthenticated);
 
   // Initial Load for Guest
@@ -87,6 +88,9 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       const parsedSessionId = newSessionId === 'new' ? null : newSessionId;
       if (activeSessionId !== parsedSessionId) {
         setActiveSessionId(parsedSessionId);
+        if (!parsedSessionId) {
+          setMessages([]);
+        }
       }
     });
   }, [activeSessionId]);
@@ -103,25 +107,43 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     const loadActiveSessionMessages = async () => {
       if (!activeSessionId || !isAuthenticated) return;
+      if (skipNextFetch.current) {
+        skipNextFetch.current = false;
+        return;
+      }
       try {
         const messagesData = await fetchSessionMessages(activeSessionId);
         const formattedMessages = (Array.isArray(messagesData) ? messagesData : messagesData.messages || [])
           .reverse()
           .map(msg => ({
             id: msg._id,
-            sender: msg.role === 'user' ? 'user' : 'system',
+            sender: msg.role,
             content: msg.content
           }));
         setMessages(formattedMessages);
       } catch (error) {
-        console.error('Failed to load active session messages', error);
-        setActiveSessionId(null);
+        console.error("Failed to load session messages in modal", error);
+        if (error.response && error.response.status === 404) {
+          setActiveSessionId(null);
+          localStorage.setItem('sharedActiveChatId', 'new');
+          setMessages([]);
+        }
       }
     };
     
-    if (activeSessionId && messages.length === 0 && isAuthenticated) {
-      loadActiveSessionMessages();
-    }
+    loadActiveSessionMessages();
+
+    const cleanup = subscribeToMessagesSync((sessionId) => {
+      if (sessionId === activeSessionId) {
+        // If we receive a sync event, we should force load even if skipNextFetch was true,
+        // but normally skipNextFetch is only true right after creation. 
+        // We bypass the skipNextFetch ref by calling a helper or temporarily clearing it.
+        skipNextFetch.current = false;
+        loadActiveSessionMessages();
+      }
+    });
+
+    return cleanup;
   }, [activeSessionId, isAuthenticated]);
 
 
@@ -163,7 +185,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
     if (!isAuthenticated) {
       // Guest Chat Flow
       try {
-        await startGuestStream([...messages, newUserMsg], userPrompt, visitorId, 'gemini-3.5-flash', (finalMessage) => {
+        await startGuestStream([...messages, newUserMsg], userPrompt, visitorId, 'gemini-flash-latest', (finalMessage) => {
           setMessages(prev => [...prev, {
             id: finalMessage._id || Date.now().toString(),
             sender: finalMessage.role === 'user' ? 'user' : 'system',
@@ -185,19 +207,30 @@ const ChatbotModal = ({ isOpen, onClose }) => {
         const newSession = await createSession(userPrompt);
         setIsCreatingSession(false);
         targetSessionId = newSession._id;
+        skipNextFetch.current = true;
         setActiveSessionId(targetSessionId);
       }
 
-      await startStream(targetSessionId, userPrompt, 'gemini-3.5-flash', (finalMessage) => {
+      await startStream(targetSessionId, userPrompt, 'gemini-flash-latest', (finalMessage) => {
         setMessages(prev => [...prev, {
           id: finalMessage._id,
           sender: finalMessage.role === 'user' ? 'user' : 'system',
           content: finalMessage.content
         }]);
+        dispatchMessagesSync(targetSessionId);
       });
     } catch (error) {
       console.error("Chat generation error", error);
+      toast.error("Failed to send message. Please try again.");
+      setMessages(prev => prev.filter(msg => msg.id !== newUserMsg.id)); // Remove optimistic message
       setIsCreatingSession(false);
+      
+      // If we got a 404 from startStream, the session is gone. Reset UI.
+      if (error.response && error.response.status === 404) {
+        setActiveSessionId(null);
+        localStorage.setItem('sharedActiveChatId', 'new');
+        setMessages([]);
+      }
     }
   };
 

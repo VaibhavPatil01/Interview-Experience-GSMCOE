@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import ChatbotModal from './ChatbotModal';
 
@@ -6,13 +6,18 @@ const FloatingChatButton = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { pathname } = useLocation();
 
-  // Hide on assistant page, the DefaultLayout handles hiding it on Login/Register
-  if (pathname === '/assistant') {
-    return null;
-  }
+  // Hide visually on assistant page instead of returning null, 
+  // so that ChatbotModal doesn't unmount and interrupt async operations like createSession.
+  const isHidden = pathname === '/assistant';
+
+  useEffect(() => {
+    if (pathname === '/assistant') {
+      setIsChatOpen(false);
+    }
+  }, [pathname]);
 
   return (
-    <>
+    <div style={{ display: isHidden ? 'none' : 'block' }}>
       {!isChatOpen && (
         <div 
           onClick={() => setIsChatOpen(true)}
@@ -40,7 +45,7 @@ const FloatingChatButton = () => {
       )}
 
       <ChatbotModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-    </>
+    </div>
   );
 };
 
