@@ -42,9 +42,6 @@ passport.use(
           password: randomUUID(),
           isAdmin: false,
           isEmailVerified: true,
-          branch: 'NA',
-          passingYear: 'NA',
-          designation: 'NA',
           about: 'Hey there! Just joined the platform.',
           github: null,
           linkedin: null,
@@ -71,6 +68,7 @@ if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
         clientID: GITHUB_CLIENT_ID,
         clientSecret: GITHUB_CLIENT_SECRET,
         callbackURL: `${SERVER_BASE_URL}/user/auth/github/callback`,
+        scope: ['user:email'],
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -90,9 +88,6 @@ if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
             password: randomUUID(),
             isAdmin: false,
             isEmailVerified: true,
-            branch: 'NA',
-            passingYear: 'NA',
-            designation: 'NA',
             about: 'Hey there! Just joined the platform via GitHub.',
             github: profile.profileUrl,
             linkedin: null,
