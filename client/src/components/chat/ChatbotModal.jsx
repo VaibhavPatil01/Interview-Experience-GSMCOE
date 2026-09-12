@@ -9,6 +9,7 @@ import ChatHistoryModal from './ChatHistoryModal';
 import { assets } from '../../assets/assets';
 import { useAppSelector } from '../../redux/store.js';
 import { toast } from 'react-hot-toast';
+import { subscribeToChatSync, dispatchChatSync } from '../../utils/chatSync';
 
 const ChatbotModal = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.userState.user);
@@ -77,8 +78,18 @@ const ChatbotModal = ({ isOpen, onClose }) => {
       } else {
         localStorage.setItem('sharedActiveChatId', 'new');
       }
+      dispatchChatSync(activeSessionId);
     }
   }, [activeSessionId, isAuthenticated]);
+
+  useEffect(() => {
+    return subscribeToChatSync((newSessionId) => {
+      const parsedSessionId = newSessionId === 'new' ? null : newSessionId;
+      if (activeSessionId !== parsedSessionId) {
+        setActiveSessionId(parsedSessionId);
+      }
+    });
+  }, [activeSessionId]);
 
   useEffect(() => {
     if (!isAuthenticated && messages.length > 0) {

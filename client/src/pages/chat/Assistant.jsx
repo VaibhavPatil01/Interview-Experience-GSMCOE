@@ -25,6 +25,7 @@ import { useChatStream } from '../../hooks/useChatStream';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ChatHistoryModal from '../../components/chat/ChatHistoryModal';
 import { assets } from '../../assets/assets';
+import { subscribeToChatSync, dispatchChatSync } from '../../utils/chatSync';
 const AIAvatar = () => (
   <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden">
     <img src={assets.chatRobotIcon} alt="AI Avatar" className="w-full h-full object-cover" />
@@ -32,6 +33,10 @@ const AIAvatar = () => (
 );
 
 const Assistant = () => {
+  const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState('');
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [activeChatId, setActiveChatId] = useState(() => {
     const stored = localStorage.getItem('sharedActiveChatId');
@@ -40,15 +45,23 @@ const Assistant = () => {
 
   useEffect(() => {
     localStorage.setItem('sharedActiveChatId', activeChatId);
+    dispatchChatSync(activeChatId);
   }, [activeChatId]);
+
+  useEffect(() => {
+    return subscribeToChatSync((newSessionId) => {
+      if (activeChatId !== (newSessionId || 'new')) {
+        setActiveChatId(newSessionId || 'new');
+        if (isLoggedIn) {
+          loadSessions(); // Reload sessions to get newly created/named chats in sidebar
+        }
+      }
+    });
+  }, [activeChatId, isLoggedIn]);
   const [inputValue, setInputValue] = useState('');
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [copiedMsgId, setCopiedMsgId] = useState(null);
-  
-  const isLoggedIn = useAppSelector((state) => state.userState.isLoggedIn);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState('');
 
   // Real State for Sessions and Messages
   const [chatHistory, setChatHistory] = useState([]);
