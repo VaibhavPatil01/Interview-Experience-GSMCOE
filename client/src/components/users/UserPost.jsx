@@ -82,7 +82,7 @@ function UserPost() {
   return (
     <>
       {isLoginModalOpen && (
-        <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={closeLoginModal} />
+        <LoginRequiredModal redirectUrl={window.location.pathname} closeModalCallback={closeLoginModal} />
       )}
       {isDeleteModalOpen && (
         <DeletePostModal

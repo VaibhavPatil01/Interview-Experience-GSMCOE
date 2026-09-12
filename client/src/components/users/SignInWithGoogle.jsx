@@ -4,7 +4,7 @@ import { setLocalStorage } from '../../utils/localStorage.js';
 function SignInWithGoogle({ redirectURLOnLogin }) {
   const handleGoogleSignIn = () => {
     setLocalStorage('google-login-redirect', redirectURLOnLogin);
-    const googleAuthUrl = `${BASE_API_URL}/user/auth/google/callback`;
+    const googleAuthUrl = `${BASE_API_URL}/user/auth/google`;
     window.open(googleAuthUrl, '_self');
   };
 

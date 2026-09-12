@@ -78,22 +78,24 @@ function Login() {
     },
     onError: (error) => toast.error(error.response?.data?.message || 'Something went wrong'),
     onSuccess: (data) => {
+      const redirectParam = searchParams.get('redirect') ? `?redirect=${searchParams.get('redirect')}` : '';
+      
       if (isResetPasswordPage) {
         toast.success(data.message || 'Password reset successfully');
-        navigate('/login');
+        navigate(`/login${redirectParam}`);
         return;
       }
 
       if (isForgotPasswordMode) {
         toast.success(data.message || 'Reset link sent successfully');
         setIsForgotPasswordMode(false);
-        navigate('/login');
+        navigate(`/login${redirectParam}`);
         return;
       }
 
       if (isSignupPage) {
         toast.success(data.message || 'Account created successfully');
-        navigate('/login');
+        navigate(`/login${redirectParam}`);
         return;
       }
 

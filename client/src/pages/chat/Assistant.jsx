@@ -367,7 +367,7 @@ const Assistant = () => {
   return (
     <>
     {isLoginModalOpen && (
-      <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={() => setIsLoginModalOpen(false)} />
+      <LoginRequiredModal redirectUrl={window.location.pathname} closeModalCallback={() => setIsLoginModalOpen(false)} />
     )}
     <div className="flex h-[calc(100vh-72px)] w-full bg-white dark:bg-[#212121] text-gray-900 dark:text-gray-100 font-sans overflow-hidden">
       

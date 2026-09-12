@@ -21,9 +21,8 @@ function GithubTokenSetter() {
 
       queryClient.refetchQueries(['user-status']);
 
-      // Reading github login redirect url and clearing it from local storage
+      // Reading github login redirect url
       const redirectUrl = getLocalStorageData('github-login-redirect');
-      localStorage.removeItem('github-login-redirect');
       
       let finalRedirect = '/';
       if (redirectUrl && typeof redirectUrl === 'string' && redirectUrl !== 'undefined' && redirectUrl !== 'null') {

@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useFormik } from 'formik';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
 import { assets } from '../../assets/assets';
@@ -77,6 +77,9 @@ function UserRegister() {
     console.log('Form valid:', formik.isValid, 'Errors:', formik.errors, 'Loading:', isLoading);
   }, [formik.values, formik.errors, isLoading]);
 
+  const [searchParams] = useSearchParams();
+  const redirectURLOnLogin = searchParams.get('redirect') || '/';
+
   return (
     <>
     <Helmet>
@@ -116,7 +119,7 @@ function UserRegister() {
           <header className="text-xl text-primary font-medium text-center mb-4">
             Registration Form
           </header>
-          <SignInWithGoogle redirectURLOnLogin="/" />
+          <SignInWithGoogle redirectURLOnLogin={redirectURLOnLogin} />
           <div className="text-center text-gray-500 font-medium my-4">OR</div>
           <form onSubmit={formik.handleSubmit} className="space-y-5">
             <div

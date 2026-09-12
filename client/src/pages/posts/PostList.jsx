@@ -150,7 +150,7 @@ function PostList() {
         <meta property="og:type" content="website" />
       </Helmet>
       {isLoginModalOpen && (
-        <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={closeLoginModal} />
+        <LoginRequiredModal redirectUrl={window.location.pathname} closeModalCallback={closeLoginModal} />
       )}
       {isDeleteModalOpen && (
         <DeletePostModal

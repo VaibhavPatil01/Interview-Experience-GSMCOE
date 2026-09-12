@@ -206,7 +206,7 @@ const AIResumeAnalyser = () => {
       </Helmet>
 
       {isLoginModalOpen && (
-        <LoginRequiredModal redirectUrl={redirectUrl} closeModalCallback={() => setIsLoginModalOpen(false)} />
+        <LoginRequiredModal redirectUrl={window.location.pathname} closeModalCallback={() => setIsLoginModalOpen(false)} />
       )}
 
       <main className="min-h-screen text-slate-800 dark:text-gray-100 font-sans pb-20">

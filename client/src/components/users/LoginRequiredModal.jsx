@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IoMdClose } from 'react-icons/io';
 
-function LoginRequiredModal({ redirecUrl, closeModalCallback }) {
+function LoginRequiredModal({ redirectUrl, closeModalCallback }) {
   const backdropRef = useRef(null);
 
   const handleModalClick = (event) => {
@@ -42,14 +42,14 @@ function LoginRequiredModal({ redirecUrl, closeModalCallback }) {
 
         <div className="mt-6 flex justify-end gap-4 flex-wrap">
           <Link
-            to={`/login?redirect=${redirecUrl}`}
+            to={`/login?redirect=${redirectUrl}`}
             className="text-center cursor-pointer text-white bg-accent hover:bg-accent-dark font-medium text-base rounded-lg py-2.5 px-10 bg-primary"
           >
             Login
           </Link>
 
           <Link
-            to={`/register?redirect=${redirecUrl}`}
+            to={`/register?redirect=${redirectUrl}`}
             className="text-center cursor-pointer text-primary  border border-primary font-medium text-base rounded-lg py-2.5 px-8"
           >
             Register

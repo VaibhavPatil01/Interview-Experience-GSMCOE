@@ -21,9 +21,8 @@ function GoogleTokenSetter() {
 
       queryClient.refetchQueries(['user-status']);
 
-      // Reading google login redirect url and clearing it from local storage
+      // Reading google login redirect url
       const redirectUrl = getLocalStorageData('google-login-redirect');
-      localStorage.removeItem('google-login-redirect');
       
       let finalRedirect = '/';
       if (redirectUrl && typeof redirectUrl === 'string' && redirectUrl !== 'undefined' && redirectUrl !== 'null') {
